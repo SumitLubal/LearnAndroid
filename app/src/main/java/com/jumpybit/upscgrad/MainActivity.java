@@ -1,7 +1,10 @@
 package com.jumpybit.upscgrad;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.ListViewCompat;
@@ -9,8 +12,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -31,16 +35,30 @@ public class MainActivity extends AppCompatActivity {
     private ArrayAdapter<String> adapter;
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        updateWeather();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        String a[] = new String[]{"hello ", " hello 12 ", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34"};
+        String a[] = new String[]{"hello ", "hello 12 ", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34"};
         fakeData = new ArrayList<>();
         fakeData.addAll(Arrays.asList(a));
         a = null;
         weather_list = (ListViewCompat) findViewById(R.id.weather_list_view);
         adapter = new ArrayAdapter<String>(this, R.layout.weather_update_textview, R.id.weather_list_view_TextView, fakeData);
         weather_list.setAdapter(adapter);
+        weather_list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Toast.makeText(getApplication(),"Item "+(i+1)+" clicked!",Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getApplicationContext(),DetailActivity.class).putExtra(Intent.EXTRA_TEXT,adapter.getItem(i));
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -50,12 +68,20 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    private void updateWeather(){
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        String locationPIN = sp.getString(getResources().getString(R.string.location_key),getResources().getString(R.string.location));
+        new FetchWeatherTask().execute(new String[]{locationPIN});
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_refresh) {
             Log.d(TAG, "Action Refresh clicked!!");
-            new FetchWeatherTask().execute(new String[]{"411046"});
+            updateWeather();
+        }else if(id == R.id.action_settings){
+            Log.d(TAG, "Action Refresh clicked!!");
+            startActivity(new Intent(this,SettingsActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }
@@ -83,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
                 // Construct the URL for the OpenWeatherMap query
                 // Possible parameters are avaiable at OWM's forecast API page, at
                 // http://openweathermap.org/API#forecast
-                URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?q=94043&mode=json&units=metric&cnt=7&appid=dc31cf7c01ee0b4fe650e22953579996");
+                URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?q="+postalCode+"&mode=json&units=metric&cnt=7&appid=dc31cf7c01ee0b4fe650e22953579996");
                 Uri.Builder builder = new Uri.Builder();
 
 

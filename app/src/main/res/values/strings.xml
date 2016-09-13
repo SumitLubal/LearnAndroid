@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">UPSCGrad</string>
+    <string name="title_activity_detail">DetailActivity</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="location" translatable="false">411045</string>
+    <string name="location_key" translatable="false">location</string>
 </resources>
