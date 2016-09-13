@@ -38,11 +38,16 @@ public class WeatherDataParser {
      */
     private String formatHighLows(double high, double low) {
         // For presentation, assume the user doesn't care about tenths of a degree.
+        if(MainActivity.unitType.equals("1")){
+            Log.d("Parser","Found type:"+MainActivity.unitType);
+            high = (high*1.8) +32;
+            low = (low*1.8)+32;
+        }else if(!MainActivity.unitType.equals("0")){
+            Log.d("Parser","Unit type not found");
+        }
         long roundedHigh = Math.round(high);
         long roundedLow = Math.round(low);
-
-        String highLowStr = roundedHigh + "/" + roundedLow;
-        return highLowStr;
+        return roundedHigh + "/" + roundedLow;
     }
 
     /**

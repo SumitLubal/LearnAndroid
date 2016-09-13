@@ -36,10 +36,17 @@ public class MainActivity extends AppCompatActivity {
     ListViewCompat weather_list;
     TextView cityName_TV;
     private ArrayAdapter<String> adapter;
+    public static String unitType = "Metric";
+    private String locationPIN;
 
     @Override
     protected void onStart() {
         super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         updateWeather();
     }
 
@@ -48,10 +55,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         cityName_TV = (TextView) findViewById(R.id.cityname_textview);
-        String a[] = new String[]{"hello ", "hello 12 ", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34"};
         fakeData = new ArrayList<>();
-        fakeData.addAll(Arrays.asList(a));
-        a = null;
         weather_list = (ListViewCompat) findViewById(R.id.weather_list_view);
         adapter = new ArrayAdapter<String>(this, R.layout.weather_update_textview, R.id.weather_list_view_TextView, fakeData);
         weather_list.setAdapter(adapter);
@@ -74,8 +78,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateWeather(){
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
-        String locationPIN = sp.getString(getResources().getString(R.string.location_key),getResources().getString(R.string.location));
-        new FetchWeatherTask().execute(new String[]{locationPIN});
+        locationPIN = sp.getString(getResources().getString(R.string.location_key),getResources().getString(R.string.location));
+        unitType = sp.getString(getResources().getString(R.string.unit_key),"0");
+        Log.d(TAG,"Unit Type "+ (unitType.equals("0") ? "Metric":"Imperial"));
+        new FetchWeatherTask().execute(locationPIN);
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -86,8 +92,21 @@ public class MainActivity extends AppCompatActivity {
         }else if(id == R.id.action_settings){
             Log.d(TAG, "Action Refresh clicked!!");
             startActivity(new Intent(this,SettingsActivity.class));
+        }else if (id == R.id.action_viewonmap){
+            Log.d(TAG,"Action view map clicked");
+            openMapsView();
         }
         return super.onOptionsItemSelected(item);
+    }
+    private void openMapsView(){
+        Uri geoLocation = Uri.parse("geo:0,0?").buildUpon()
+                .appendQueryParameter("q", locationPIN)
+                .build();
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, geoLocation);
+        if (mapIntent.resolveActivity(getPackageManager()) != null){
+            Log.d(TAG,"Starting maps");
+            startActivity(mapIntent);
+        }
     }
 
     public class FetchWeatherTask extends AsyncTask<String, String[], ArrayList<String>> {
