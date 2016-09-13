@@ -122,5 +122,23 @@ public class WeatherDataParser {
 
     }
 
+
+    public String getCityName(String forecastJsonStr) {
+        String cityName="Unknown";
+        try {
+            final String OWM_CITY = "city";
+            final String OWM_NAME = "name";
+            final String OWM_COUNTY = "country";
+            JSONObject forecastJson = new JSONObject(forecastJsonStr);
+            JSONObject cityObject = forecastJson.getJSONObject(OWM_CITY);
+            String city = cityObject.getString(OWM_NAME);
+            String country = cityObject.getString(OWM_COUNTY);
+            cityName = city+", "+ country;
+            Log.d("Parsed cityname",cityName);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return cityName;
+    }
 }
 

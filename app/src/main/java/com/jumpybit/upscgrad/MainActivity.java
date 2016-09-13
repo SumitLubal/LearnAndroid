@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -23,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -32,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     ArrayList<String> fakeData;
     ListViewCompat weather_list;
+    TextView cityName_TV;
     private ArrayAdapter<String> adapter;
 
     @Override
@@ -44,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        cityName_TV = (TextView) findViewById(R.id.cityname_textview);
         String a[] = new String[]{"hello ", "hello 12 ", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34", "hello 34"};
         fakeData = new ArrayList<>();
         fakeData.addAll(Arrays.asList(a));
@@ -86,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public class FetchWeatherTask extends AsyncTask<String, String[], String[]> {
+    public class FetchWeatherTask extends AsyncTask<String, String[], ArrayList<String>> {
         final private String TAG = FetchWeatherTask.class.getSimpleName();
         private String postalCode = "411045";
         private String modeType = "json";
@@ -95,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
         private String appid = "dc31cf7c01ee0b4fe650e22953579996";
 
         @Override
-        protected String[] doInBackground(String... params) {
+        protected ArrayList<String> doInBackground(String... params) {
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
             postalCode = params[0];
@@ -166,7 +170,11 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             try {
-                return (new WeatherDataParser()).getWeatherDataFromJson(forecastJsonStr, Integer.parseInt(countForecast));
+                //below string array contents first item as city name and rest are forecast data for 7 days
+                ArrayList<String> data = new ArrayList<>();
+                data.addAll(Arrays.asList((new WeatherDataParser()).getWeatherDataFromJson(forecastJsonStr, Integer.parseInt(countForecast))));
+                data.add(0,new WeatherDataParser().getCityName(forecastJsonStr));
+                return data;
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -174,10 +182,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(String[] strings) {
-            if (strings != null) {
+        protected void onPostExecute(ArrayList data) {
+            if (data != null) {
                 fakeData.clear();
-                fakeData.addAll(Arrays.asList(strings));
+                cityName_TV.setText((String) data.remove(0));
+                fakeData.addAll(data);
                 adapter.notifyDataSetChanged();
             }else{
                 Toast.makeText(getApplicationContext(),"No internet access",Toast.LENGTH_SHORT).show();

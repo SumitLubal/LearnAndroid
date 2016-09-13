@@ -3,14 +3,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.jumpybit.upscgrad.MainActivity"
-    android:orientation="horizontal">
+    tools:context="com.jumpybit.upscgrad.MainActivity">
+
+    <TextView
+        android:id="@+id/cityname_textview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/city" />
+
     <android.support.v7.widget.ListViewCompat
+        android:id="@+id/weather_list_view"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:id="@+id/weather_list_view"></android.support.v7.widget.ListViewCompat>
+        android:layout_height="wrap_content" />
 </LinearLayout>
