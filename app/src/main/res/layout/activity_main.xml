@@ -14,10 +14,11 @@
         android:id="@+id/cityname_textview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/city" />
+        android:text="@string/city"
+        android:padding="20dp" />
 
     <android.support.v7.widget.ListViewCompat
         android:id="@+id/weather_list_view"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 </LinearLayout>

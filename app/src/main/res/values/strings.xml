@@ -11,4 +11,6 @@
     <string name="action_location_text">Location</string>
     <string name="action_refresh">Refresh</string>
     <string name="action_settings_text">Settings</string>
+    <string name="action_share_text">Share</string>
+    <string name="action_setting_text">Setting</string>
 </resources>
